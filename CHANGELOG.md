@@ -2,6 +2,21 @@
 
 Todas as mudanças notáveis do mcp-brasil estão documentadas neste arquivo.
 
+## [0.6.0] - 2026-06-07
+
+### Features
+
+- **bnmp:** Banco Nacional de Mandados de Prisão (CNJ) — busca de mandados por nome via portalbnmp.cnj.jus.br
+- **oab:** Cadastro Nacional de Advogados (OAB/CNA) — consulta por nome, número OAB ou seccional
+- **querido_diario:** Diários oficiais municipais (Open Knowledge Brasil) — busca textual em publicações de centenas de municípios
+- **procurados:** Interpol Red Notices — busca de foragidos internacionais com vínculo ao Brasil
+- **transparencia:** Adicionada ferramenta `buscar_lista_suja` — Cadastro de Empregadores com trabalho análogo à escravidão (MTE)
+
+### Infrastructure
+
+- Serviço systemd `mcp-brasil.service` instalado e habilitado para inicialização automática no boot
+- Claude Code, Pcode e Qwen Code migrados para versão local (`127.0.0.1:8889`)
+
 ## [0.5.0] - 2026-03-27
 
 ### Bug Fixes

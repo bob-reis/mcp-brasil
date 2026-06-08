@@ -252,3 +252,14 @@ class RenunciaFiscal(BaseModel):
     fundamentacao_legal: str | None = None
     funcao_governo: str | None = None
     valor_renunciado: float | None = None
+
+
+class EmpregadorListaSuja(BaseModel):
+    """Empregador cadastrado na Lista Suja do Trabalho Escravo (MTE)."""
+
+    empregador: str | None = None
+    cnpj_cpf: str | None = None
+    uf: str | None = None
+    municipio: str | None = None
+    ano_acao_fiscal: str | None = None
+    trabalhadores_resgatados: int | None = None

@@ -874,3 +874,52 @@ async def buscar_renuncias_fiscais(
         ["Mês/Ano", "Beneficiário", "CNPJ", "Tributo", "Tipo", "Valor Renunciado"], rows
     )
     return table + _pagination_hint(len(renuncias), pagina)
+
+
+async def buscar_lista_suja(
+    nome: str = "",
+    uf: str = "",
+    pagina: int = 1,
+) -> str:
+    """Busca empregadores na Lista Suja do Trabalho Escravo (Cadastro de Empregadores — MTE).
+
+    Retorna pessoas físicas e jurídicas flagradas pelo Ministério do Trabalho com uso
+    de trabalho análogo à escravidão. Empregador na lista = autuado por fiscal do MTE.
+
+    Args:
+        nome: Nome do empregador ou empresa (parcial).
+        uf: Sigla do estado (ex: "MT", "PA", "TO"). Filtra por UF.
+        pagina: Página de resultados (padrão: 1).
+
+    Returns:
+        Tabela com empregadores encontrados, quantidade de trabalhadores resgatados e localização.
+    """
+    try:
+        empregadores = await client.buscar_lista_suja(nome, uf, pagina)
+    except HttpClientError as exc:
+        return f"Erro ao consultar Lista Suja do Trabalho Escravo: {exc}"
+
+    if not empregadores:
+        return (
+            "Nenhum empregador encontrado na Lista Suja do Trabalho Escravo "
+            f"para os critérios informados (nome='{nome}', uf='{uf}')."
+        )
+
+    rows = [
+        (
+            e.empregador or "—",
+            e.cnpj_cpf or "—",
+            e.municipio or "—",
+            e.uf or "—",
+            e.ano_acao_fiscal or "—",
+            str(e.trabalhadores_resgatados) if e.trabalhadores_resgatados is not None else "—",
+        )
+        for e in empregadores
+    ]
+    header = "**Lista Suja do Trabalho Escravo — Cadastro de Empregadores (MTE)**\n\n"
+    table = header + markdown_table(
+        ["Empregador", "CNPJ/CPF", "Município", "UF", "Ano Ação Fiscal", "Trabalhadores Resgatados"],
+        rows,
+    )
+    footer = "\n\n_Fonte: Portal da Transparência — Cadastro de Empregadores · portaldatransparencia.gov.br_"
+    return table + _pagination_hint(len(empregadores), pagina) + footer

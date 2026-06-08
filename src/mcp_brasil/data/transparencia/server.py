@@ -14,6 +14,7 @@ from .tools import (
     buscar_convenios,
     buscar_emendas,
     buscar_licitacoes,
+    buscar_lista_suja,
     buscar_notas_fiscais,
     buscar_pep,
     buscar_renuncias_fiscais,
@@ -51,6 +52,7 @@ mcp.tool(consultar_cnpj, tags={"consulta", "cnpj", "pessoa-juridica"})
 mcp.tool(detalhar_contrato, tags={"detalhe", "contratos"})
 mcp.tool(detalhar_servidor, tags={"detalhe", "servidores", "remuneracao"})
 mcp.tool(buscar_renuncias_fiscais, tags={"busca", "renuncias", "tributario", "beneficios-fiscais"})
+mcp.tool(buscar_lista_suja, tags={"busca", "trabalho-escravo", "mte", "anticorrupcao", "compliance"})
 
 # Resources (URIs without namespace prefix — mount adds "transparencia/" automatically)
 mcp.resource("data://endpoints", mime_type="application/json")(endpoints_disponiveis)

@@ -49,6 +49,7 @@ from .constants import (
     PEP_URL,
     PESSOAS_FISICAS_URL,
     PESSOAS_JURIDICAS_URL,
+    LISTA_SUJA_URL,
     RENUNCIAS_URL,
     SANCOES_DATABASES,
     SERVIDOR_DETALHE_URL,
@@ -65,6 +66,7 @@ from .schemas import (
     ContratoFornecedor,
     Convenio,
     Emenda,
+    EmpregadorListaSuja,
     Licitacao,
     NotaFiscal,
     PessoaExpostaPoliticamente,
@@ -926,3 +928,29 @@ async def buscar_renuncias(
 
     data = await _get(RENUNCIAS_URL, params)
     return _safe_parse_list(data, _parse_renuncia, "renuncias-receitas")
+
+
+def _parse_empregador_lista_suja(item: dict[str, Any]) -> EmpregadorListaSuja:
+    return EmpregadorListaSuja(
+        empregador=item.get("nomeEmpregador"),
+        cnpj_cpf=item.get("cpfCnpjEmpregador"),
+        uf=item.get("uf"),
+        municipio=item.get("municipio"),
+        ano_acao_fiscal=str(item.get("anoAcaoFiscal", "")),
+        trabalhadores_resgatados=item.get("qtdTrabalhadores"),
+    )
+
+
+async def buscar_lista_suja(
+    nome: str = "",
+    uf: str = "",
+    pagina: int = 1,
+) -> list[EmpregadorListaSuja]:
+    """Busca empregadores na Lista Suja do Trabalho Escravo (Portal da Transparência/MTE)."""
+    params: dict[str, Any] = {"pagina": pagina}
+    if nome:
+        params["nomeEmpregador"] = nome
+    if uf:
+        params["uf"] = uf.upper()
+    data = await _get(LISTA_SUJA_URL, params)
+    return _safe_parse_list(data, _parse_empregador_lista_suja, "lista-suja")

@@ -30,6 +30,7 @@ PESSOAS_JURIDICAS_URL = f"{TRANSPARENCIA_API_BASE}/pessoas-juridicas"
 CONTRATO_DETALHE_URL = f"{TRANSPARENCIA_API_BASE}/contratos/id"
 SERVIDOR_DETALHE_URL = f"{TRANSPARENCIA_API_BASE}/servidores"
 RENUNCIAS_URL = f"{TRANSPARENCIA_API_BASE}/renuncias-receitas"
+LISTA_SUJA_URL = f"{TRANSPARENCIA_API_BASE}/empregadores"
 
 # Sanções — cada base tem endpoint e nome de parâmetro diferentes
 SANCOES_DATABASES: dict[str, dict[str, str]] = {
