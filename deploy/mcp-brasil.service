@@ -1,0 +1,14 @@
+[Unit]
+Description=mcp-brasil MCP HTTP Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/mcp-brasil
+ExecStart=/opt/mcp-brasil/scripts/run_http_8889.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

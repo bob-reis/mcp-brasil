@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "mcp-brasil": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://127.0.0.1:8889/mcp",
+        "--allow-http",
+        "--transport",
+        "http-only"
+      ],
+      "env": {
+        "MCP_BRASIL_TOOL_SEARCH": "bm25"
+      }
+    }
+  }
+}
