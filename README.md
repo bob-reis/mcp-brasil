@@ -182,6 +182,7 @@ Além das tools das features, o server raiz expõe 4 meta-tools: `listar_feature
 | DataJud/CNJ | Sim para ativar a feature | [Cadastro gratuito](https://datajud-wiki.cnj.jus.br/api-publica/acesso) |
 | OpenSanctions | Sim para ativar a feature | [API keys](https://www.opensanctions.org/docs/api/) |
 | Biblioteca de Anúncios da Meta | Sim para ativar a feature `anuncios_eleitorais` | [Meta for Developers](https://developers.facebook.com/) |
+| Dados.gov.br | Opcional (melhora rate limits) | [Portal Dados Abertos](https://dados.gov.br) |
 | Todas as outras fontes | Nenhuma chave | — |
 
 Configure via variáveis de ambiente ou `.env`:
@@ -191,6 +192,7 @@ TRANSPARENCIA_API_KEY=sua-chave
 DATAJUD_API_KEY=sua-chave
 OPENSANCTIONS_API_KEY=sua-chave
 META_ACCESS_TOKEN=seu-token
+DADOS_GOV_BR_API_TOKEN=seu-token  # opcional
 ```
 
 ## Configuração
@@ -201,9 +203,30 @@ META_ACCESS_TOKEN=seu-token
 | `DATAJUD_API_KEY` | — | Chave do DataJud/CNJ |
 | `OPENSANCTIONS_API_KEY` | — | Chave da API OpenSanctions |
 | `META_ACCESS_TOKEN` | — | Token da Meta Graph API para anúncios eleitorais |
+| `DADOS_GOV_BR_API_TOKEN` | — | Token bearer do dados.gov.br (opcional) |
 | `MCP_BRASIL_TOOL_SEARCH` | `bm25` | Modo de discovery: `bm25`, `code_mode` ou `none` |
 | `MCP_BRASIL_HTTP_TIMEOUT` | `30.0` | Timeout HTTP em segundos |
 | `MCP_BRASIL_HTTP_MAX_RETRIES` | `3` | Máximo de retentativas HTTP |
+
+### LLM local (Ollama)
+
+As meta-tools `recomendar_tools` e `planejar_consulta` usam um LLM para entender intenção e montar planos de execução. Por padrão esperam `ANTHROPIC_API_KEY`, mas podem rodar inteiramente **local via Ollama**:
+
+```bash
+LLM_PROVIDER=ollama          # "ollama" ou "anthropic" (default: anthropic)
+OLLAMA_BASE_URL=http://localhost:11434  # URL do servidor Ollama
+OLLAMA_MODEL=qwen3.5:cloud   # qualquer modelo disponível no Ollama
+```
+
+Modelos recomendados: `qwen3.5:cloud`, `qwen3-coder:480b-cloud`, `llama3.1:8b`.  
+Quando `LLM_PROVIDER=anthropic`, configure `ANTHROPIC_API_KEY` com uma chave em [console.anthropic.com](https://console.anthropic.com/settings/keys).
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `LLM_PROVIDER` | `anthropic` | Provider LLM: `ollama` ou `anthropic` |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | URL base do servidor Ollama |
+| `OLLAMA_MODEL` | `qwen3.5:cloud` | Modelo Ollama a usar |
+| `ANTHROPIC_API_KEY` | — | Chave Anthropic (necessária quando `LLM_PROVIDER=anthropic`) |
 
 ## Documentação
 
