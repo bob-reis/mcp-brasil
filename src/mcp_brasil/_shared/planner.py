@@ -1,9 +1,4 @@
-"""LLM-powered query planner for mcp-brasil.
-
-Uses the Anthropic API (claude-haiku-4-5) to analyze user queries and build
-structured execution plans with ordered steps, tool assignments, parameters,
-and dependency information between steps.
-"""
+"""LLM-powered query planner for mcp-brasil."""
 
 from __future__ import annotations
 
@@ -12,7 +7,7 @@ import logging
 
 from pydantic import BaseModel
 
-from ..settings import ANTHROPIC_API_KEY
+from .llm import llm_available, llm_complete
 
 logger = logging.getLogger("mcp-brasil.planner")
 
@@ -226,53 +221,24 @@ Transparencia requer TRANSPARENCIA_API_KEY."
 
 
 async def planejar_consulta_impl(query: str, catalog: str) -> str:
-    """Call Anthropic API to build a structured execution plan.
+    """Build a structured execution plan using the configured LLM (Ollama or Anthropic)."""
+    ok, err = llm_available()
+    if not ok:
+        return err
 
-    Args:
-        query: Natural language question from the user.
-        catalog: Pre-built catalog string of all tools.
-
-    Returns:
-        Markdown-rendered execution plan or error message.
-    """
-    try:
-        import anthropic
-    except ImportError:
-        return (
-            "Erro: O pacote 'anthropic' não está instalado. "
-            "Instale com: pip install 'mcp-brasil[llm]'\n\n"
-            "Alternativa: use a tool 'search_tools' para buscar por palavras-chave."
-        )
-
-    api_key = ANTHROPIC_API_KEY
-    if not api_key:
-        return (
-            "Erro: ANTHROPIC_API_KEY não configurada. "
-            "Defina a variável de ambiente ANTHROPIC_API_KEY para usar esta tool.\n\n"
-            "Alternativa: use a tool 'search_tools' para buscar por palavras-chave."
-        )
-
-    client = anthropic.AsyncAnthropic(api_key=api_key)
     system_prompt = _SYSTEM_PROMPT.format(catalog=catalog)
+    raw_text = await llm_complete(system_prompt, query, max_tokens=2048)
+
+    # Strip <think>...</think> blocks that some models (e.g. qwen3) emit
+    import re
+    raw_text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+
+    # Strip markdown code fences if present
+    raw_text = re.sub(r"^```[a-z]*\n?", "", raw_text).rstrip("`").strip()
 
     try:
-        response = await client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=2048,
-            system=system_prompt,
-            messages=[{"role": "user", "content": query}],
-        )
-        block = response.content[0]
-        raw_text = str(getattr(block, "text", ""))
-
-        # Try to parse as structured plan
-        try:
-            plano = PlanoConsulta.model_validate(json.loads(raw_text))
-            return plano.to_markdown()
-        except (json.JSONDecodeError, Exception):
-            logger.warning("Failed to parse plan as JSON, returning raw text")
-            return raw_text
-
-    except Exception as e:
-        logger.error("Erro ao chamar Anthropic API: %s", e)
-        return f"Erro ao consultar IA: {e}\n\nUse 'search_tools' como alternativa."
+        plano = PlanoConsulta.model_validate(json.loads(raw_text))
+        return plano.to_markdown()
+    except (json.JSONDecodeError, Exception):
+        logger.warning("Failed to parse plan as JSON, returning raw text")
+        return raw_text

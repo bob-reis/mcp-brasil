@@ -24,5 +24,9 @@ USER_AGENT: str = os.environ.get("MCP_BRASIL_USER_AGENT", "mcp-brasil/0.1.0")
 # "none": No transform — all 154+ tools visible at once
 TOOL_SEARCH: str = os.environ.get("MCP_BRASIL_TOOL_SEARCH", "bm25")
 
-# --- LLM Discovery (recomendar_tools) ---
+# --- LLM Discovery (recomendar_tools / planejar_consulta) ---
+# Provider: "ollama" (local, OpenAI-compatible) ou "anthropic"
+LLM_PROVIDER: str = os.environ.get("LLM_PROVIDER", "anthropic")
 ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY", "")
+OLLAMA_BASE_URL: str = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL: str = os.environ.get("OLLAMA_MODEL", "qwen3.5:cloud")
